@@ -38,7 +38,7 @@ void checkIfTriangle(float *);
 int checkIfRectangular(float *);
 int checkIfEquilateral(float *);
 int checkIfIsosceles(float *);
-int isEqual(float, float);
+int compareFloats(float, float);
 
 //-----------------------------------------------------------------------------
 ///
@@ -70,7 +70,7 @@ int checkIfRectangular(float* triplet_data)
   float a = triplet_data[0];
   float b = triplet_data[1];
   float c = triplet_data[2];
-  if(isEqual(a * a + b * b, c * c))
+  if(compareFloats(a * a + b * b, c * c))
   {
     return TRUE;
   }
@@ -92,7 +92,7 @@ int checkIfIsosceles(float *triplet_data)
 {
   float a = triplet_data[0];
   float b = triplet_data[1];
-  if(isEqual(a, b))
+  if(compareFloats(a, b))
   {
     return TRUE;
   }
@@ -114,7 +114,7 @@ int checkIfEquilateral(float *triplet_data)
   float a = triplet_data[0];
   float b = triplet_data[1];
   float c = triplet_data[2];
-  if(isEqual(a, b) && isEqual(b, c))
+  if(compareFloats(a, b) && compareFloats(b, c))
   {
     return TRUE;
   }
@@ -131,7 +131,7 @@ int checkIfEquilateral(float *triplet_data)
 /// @param b Second float variable
 /// @return int TRUE or FALSE
 //
-int isEqual(float a, float b)
+int compareFloats(float a, float b)
 {
   if(fabs(a-b) >= FLT_EPSILON)
   {
@@ -158,7 +158,7 @@ void checkIfTriangle(float *triplet_data)
   float b = triplet_data[1];
   float c = triplet_data[2];
 
-  if(isEqual(a + b, c) || fabs(a+b-c)<FLT_EPSILON)
+  if(compareFloats(a + b, c) || fabs(a+b-c)<FLT_EPSILON)
   {
     printf("(a=%.6f, b=%.6f, c=%.6f) is NO triangle.\n", a, b, c);
   }
