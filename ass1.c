@@ -1,21 +1,37 @@
+//-----------------------------------------------------------------------------
+// ass1.c
+//
+// This program reads in some possible triangular side lengths from the user
+// and then checks this data and prints out whether or not it is an
+// triangle and if yes, what kind of triangle it is (equilateral, isosceles,
+// rectangular).
+//
+// Group: Group 10, study assistant David Bidner
+//
+// Authors: Fabian Obermayer 01131905
+// Daniel Krems <Matriculum Number>
+//-----------------------------------------------------------------------------
+//
+
+// all needed includes
 #include <stdio.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <float.h>
 #include <math.h>
 
+// necessary defines
 #define TRUE 1
 #define FALSE 0
-#define SIDES 3
+#define SIDES 3 // nr of sides of a triangle
 #define EXIT_SUCCESS 0
-
 
 
 // Function Prototypes
 int getNumberOfTriplets();
 float getTripletSideLength(char *);
 void getTripletData(float (*)[SIDES], int);
-//void printTripletData(float (*)[SIDES], int);
+//void printTripletData(float (*)[SIDES], int); // for DEBUG purposes
 void sort(float (*)[SIDES], int, int);
 void checkTriplets(float (*)[SIDES], int);
 void checkIfTriangle(float *);
@@ -24,6 +40,14 @@ int checkIfEquilateral(float *);
 int checkIfIsosceles(float *);
 int isEqual(float, float);
 
+//-----------------------------------------------------------------------------
+///
+/// Goes through all the triplets found at the triplet_data array and checks
+/// if they are triangles and if yes which type of triangle they are.
+/// @param triplet_data pointer to the triplet array where the side lengths
+/// are stored
+/// @return void
+//
 void checkTriplets(float (*triplet_data)[SIDES], int nr_of_triplets)
 {
   int i;
@@ -33,7 +57,14 @@ void checkTriplets(float (*triplet_data)[SIDES], int nr_of_triplets)
     checkIfTriangle(triplet_data[i]);
   }
 }
-
+//-----------------------------------------------------------------------------
+///
+/// Checks if the data found in the triplet_data array is an rectangular
+/// triangle and returns TRUE if yes and FALSE if not.
+/// @param triplet_data pointer to the triplet array where the side lengths
+/// are stored
+/// @return int TRUE or FALSE
+//
 int checkIfRectangular(float* triplet_data)
 {
   float a = triplet_data[0];
@@ -49,7 +80,14 @@ int checkIfRectangular(float* triplet_data)
   }
 }
 
-
+//-----------------------------------------------------------------------------
+///
+/// Checks if the data found in the triplet_data array is an isosceles
+/// triangle and returns TRUE if yes and FALSE if not.
+/// @param triplet_data pointer to the triplet array where the side lengths
+/// are stored
+/// @return int TRUE or FALSE
+//
 int checkIfIsosceles(float *triplet_data)
 {
   float a = triplet_data[0];
@@ -63,7 +101,14 @@ int checkIfIsosceles(float *triplet_data)
     return FALSE;
   }
 }
-
+//-----------------------------------------------------------------------------
+///
+/// Checks if the data found in the triplet_data array is an equilateral
+/// triangle and returns TRUE if yes and FALSE if not.
+/// @param triplet_data pointer to the triplet array where the side lengths
+/// are stored
+/// @return int TRUE or FALSE
+//
 int checkIfEquilateral(float *triplet_data)
 {
   float a = triplet_data[0];
@@ -78,7 +123,14 @@ int checkIfEquilateral(float *triplet_data)
     return FALSE;
   }
 }
-
+//-----------------------------------------------------------------------------
+///
+/// Compares two float variables and returns TRUE if they are equal or FALSE
+/// if they are unequal
+/// @param a First float variable
+/// @param b Second float variable
+/// @return int TRUE or FALSE
+//
 int isEqual(float a, float b)
 {
   if(fabs(a-b) >= FLT_EPSILON)
@@ -91,6 +143,15 @@ int isEqual(float a, float b)
   }
 }
 
+//-----------------------------------------------------------------------------
+///
+/// Checks if the triplet is indeed an triangle by evaluating the triangle
+/// inequality. If it is a triangle it also evaluates what kind of triangle
+/// it is by calling other functions.
+/// @param triplet_data pointer to the triplet array where the side lengths
+/// are stored
+/// @return void
+//
 void checkIfTriangle(float *triplet_data)
 {
   float a = triplet_data[0];
@@ -132,7 +193,7 @@ void checkIfTriangle(float *triplet_data)
 /// @param triplet_data pointer to the triplet array that needs to be sorted
 /// @param  nr_of_triplets number of triplets (= rows) in the 2-d array
 /// @param length length of the array to be sorted
-/// return void
+/// @return void
 //
 void sort(float (*triplet_data)[SIDES], int nr_of_triplets, int length)
 {
@@ -160,10 +221,10 @@ void sort(float (*triplet_data)[SIDES], int nr_of_triplets, int length)
 
 //-----------------------------------------------------------------------------
 ///
-/// Prints the currently stored triplet data
+/// Prints the currently stored triplet data for DEBUG purposes
 /// @param triplet_data pointer to the triplet array
 /// @param nr_of_triplets number of triangles in array
-/// return void
+/// @return void
 //
 void printTripletData(float (*triplet_data)[SIDES], int nr_of_triplets)
 {
@@ -211,7 +272,7 @@ void getTripletData(float (*triplet_data)[SIDES], int nr_of_elements)
 /// correct.
 /// @param name char pointer of the name of the side
 ///
-/// @return float triangle side length
+/// @return float triplet side length
 //
 float getTripletSideLength(char *name)
 {
@@ -241,7 +302,7 @@ float getTripletSideLength(char *name)
 /// This function asks for the number of triplets to check and also checks
 /// if the input is correct.
 ///
-/// @return int nr_of_triplets
+/// @return int number of triplets
 //
 int getNumberOfTriplets()
 {
@@ -275,17 +336,14 @@ int getNumberOfTriplets()
 /// @param argc not used
 /// @param argv not used
 ///
-/// @return always zero
+/// @return int always zero
 //
 int main()
 {
   int nr_of_triplets = getNumberOfTriplets();
   float triplet_data[nr_of_triplets][SIDES];
-  //int nr_of_elements = sizeof(triplet_data)/ sizeof(triplet_data[0][0]);
   getTripletData(triplet_data, nr_of_triplets);
 
-  //printTripletData(triplet_data, nr_of_triplets);
-  //printf("\n________________________________\n");
   sort(triplet_data, nr_of_triplets, SIDES);
 
   //printTripletData(triplet_data, nr_of_triplets);
