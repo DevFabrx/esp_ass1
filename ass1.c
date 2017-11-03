@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // ass1.c
 //
 // This program reads in some possible triangular side lengths from the user
@@ -10,10 +10,10 @@
 //
 // Authors: Fabian Obermayer 01131905
 // Daniel Krems 00930736
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
 
-// all needed includes
+
 #include <stdio.h>
 #include <limits.h>
 #include <stdlib.h>
@@ -21,20 +21,26 @@
 #include <math.h>
 #include <string.h>
 
+
 // necessary defines
 #define TRUE 1
 #define FALSE 0
 #define SIDES 3 // nr of sides of a triangle
 #define EXIT_SUCCESS 0
-#define RECTANGULAR " It is a right triangle.\n"
-#define EQUILATERAL " It is an equilateral triangle.\n"
-#define ISOSCELES " It is an isosceles triangle.\n"
+#define INVALID_INPUT -1
+#define BUFFERSIZE 20
+// Text defines for multiple text usages
+#define RECTANGULAR "  It is a right triangle.\n"
+#define EQUILATERAL "  It is an equilateral triangle.\n"
+#define ISOSCELES "  It is an isosceles triangle.\n"
+#define ERROR_NUMBER_OF_TRIANGLES "[ERR] Invalid number of triangles.\n"
+#define ERROR_TRIPLET_NUMBER "[ERR] Invalid number for the triplet.\n"
 
 
 // Function Prototypes
 int getNumberOfTriplets();
 float getTripletSideLength(char *);
-void getTripletData(float (*)[SIDES], int);
+int getTripletData(float (*)[SIDES], int);
 void sort(float (*)[SIDES], int, int);
 void analyzeAllTriplets(float (*)[SIDES], int);
 void analyzeTriplet(float *);
@@ -42,6 +48,7 @@ int isRectangular(float *);
 int isEquilateral(float *);
 int isIsosceles(float *);
 int compareFloats(float, float);
+
 
 //-----------------------------------------------------------------------------
 ///
@@ -58,10 +65,12 @@ void analyzeAllTriplets(float (*triplet_data)[SIDES], int nr_of_triplets)
   int triplet_counter;
   for(triplet_counter = 0; triplet_counter < nr_of_triplets; triplet_counter++)
   {
-    printf("Triplet %d ", triplet_counter+1);
+    printf("Triplet %d ", triplet_counter + 1);
     analyzeTriplet(triplet_data[triplet_counter]);
   }
 }
+
+
 //-----------------------------------------------------------------------------
 ///
 /// Checks if the data found in the triplet_data array is an rectangular
@@ -87,6 +96,7 @@ int isRectangular(float *triplet_data)
   }
 }
 
+
 //-----------------------------------------------------------------------------
 ///
 /// Checks if the data found in the triplet_data array is an isosceles
@@ -108,6 +118,8 @@ int isIsosceles(float *triplet_data)
     return FALSE;
   }
 }
+
+
 //-----------------------------------------------------------------------------
 ///
 /// Checks if the data found in the triplet_data array is an equilateral
@@ -130,6 +142,8 @@ int isEquilateral(float *triplet_data)
     return FALSE;
   }
 }
+
+
 //-----------------------------------------------------------------------------
 ///
 /// Compares two float variables and returns TRUE if they are equal or FALSE
@@ -151,6 +165,7 @@ int compareFloats(float first_float, float second_float)
   }
 }
 
+
 //-----------------------------------------------------------------------------
 ///
 /// Checks if the triplet is indeed a triangle by evaluating the triangle
@@ -169,7 +184,7 @@ void analyzeTriplet(float *triplet_data)
   float side_c = triplet_data[2];
 
   // First we need to check if the triplet is a triangle by evaluating the
-  // triangle inequality formula: c <= a+b
+  // triangle inequality formula: c <= a+b and make sure that
   if(compareFloats(side_a + side_b, side_c) || fabs(side_a + side_b - side_c)
                                                < FLT_EPSILON)
   {
@@ -213,8 +228,8 @@ void analyzeTriplet(float *triplet_data)
 void sort(float (*triplet_data)[SIDES], int number_of_triplets, int length)
 {
   int triplet_counter;
-  int sort_counter1;
-  int sort_counter2;
+  int sort_count;
+  int sort_count2;
 
   // This is the first for loop that goes through all the triplets stored in
   // the array
@@ -223,16 +238,16 @@ void sort(float (*triplet_data)[SIDES], int number_of_triplets, int length)
   {
     float* data = triplet_data[triplet_counter];
 
-    // This is the main for loop for the bubble sorting
-    for(sort_counter1 = 0; sort_counter1 < length - 1; sort_counter1++)
+    // The main for loop for the bubble sorting algorithm
+    for(sort_count = 0; sort_count < length - 1; sort_count++)
     {
-      for(sort_counter2 = 0; sort_counter2 < length - 1; sort_counter2++)
+      for(sort_count2 = 0; sort_count2 < length - sort_count - 1; sort_count2++)
       {
-        if (data[sort_counter2] > data[sort_counter2 + 1])
+        if (data[sort_count2] > data[sort_count2 + 1])
         {
-          float temporary_clone = data[sort_counter2];
-          data[sort_counter2] = data[sort_counter2 + 1];
-          data[sort_counter2+1] = temporary_clone;
+          float temporary_clone = data[sort_count2];
+          data[sort_count2] = data[sort_count2 + 1];
+          data[sort_count2+1] = temporary_clone;
         }
       }
     }
@@ -248,9 +263,9 @@ void sort(float (*triplet_data)[SIDES], int number_of_triplets, int length)
 /// @param triplet_data float pointer to the triplet data array
 /// @param number_of_triplets number of triplets in the data array
 ///
-/// @return void
+/// @return int INVALID_INPUT if invalid input or 1 if successful
 //
-void getTripletData(float (*triplet_data)[SIDES], int number_of_triplets)
+int getTripletData(float (*triplet_data)[SIDES], int number_of_triplets)
 {
   char* side_text[]= {"first", "second", "third"};
 
@@ -261,10 +276,15 @@ void getTripletData(float (*triplet_data)[SIDES], int number_of_triplets)
   {
     for(length_counter = 0; length_counter < SIDES; length_counter++)
     {
-      triplet_data[triplet_counter][length_counter] =
-          getTripletSideLength(side_text[length_counter]);
+      float side_length = getTripletSideLength(side_text[length_counter]);
+      if((int)side_length == -1)
+      {
+        return INVALID_INPUT;
+      }
+      triplet_data[triplet_counter][length_counter] = side_length;
     }
   }
+  return 1;
 }
 
 
@@ -279,29 +299,40 @@ void getTripletData(float (*triplet_data)[SIDES], int number_of_triplets)
 //
 float getTripletSideLength(char *side_text)
 {
-
+  // Input loop
   while(TRUE)
   {
     printf("Please enter the %s number of the triplet: ", side_text);
-    // Input buffer
-    char input_buffer[80];
+    char input_buffer[BUFFERSIZE];
     char* line;
-    line = fgets(input_buffer, 80, stdin);
+    line = fgets(input_buffer, BUFFERSIZE, stdin);
+    // if fgets returns NULL, EOF or error occurred and so we need to end the
+    // program
     if(line == NULL)
     {
-      exit(EXIT_SUCCESS);
+      return INVALID_INPUT;
     }
+    // If the input exceeds the buffer size of the input, we need to read the
+    // overflowing data so that it is not inserted in the next input
+    if((strchr(line, '\n') == NULL))
+    {
+      char clear_stdin;
+      while((clear_stdin = fgetc(stdin) != '\n' && clear_stdin != EOF));
+      printf(ERROR_TRIPLET_NUMBER);
+      continue;
+    }
+    // If input is just \n the promp will show again
     if(!strcmp(line, "\n"))
     {
       continue;
     }
 
     float triplet_side_length = atof(line);
-
-    if (triplet_side_length == 0 || triplet_side_length < 0.0 ||
+    // Check if input data is valid
+    if ( compareFloats(triplet_side_length, 0.0) || triplet_side_length < 0.0 ||
         triplet_side_length > FLT_MAX)
     {
-      printf("[ERR] Invalid number for the triplet.\n");
+      printf(ERROR_TRIPLET_NUMBER);
       continue;
     }
     else
@@ -323,13 +354,23 @@ int getNumberOfTriplets()
 {
   while(TRUE)
   {
-    char input[80]; // input char pointer initialized to null
+    char input[BUFFERSIZE];
     printf("Please enter the number of triangles to check: ");
-    char* line = fgets(input, 80, stdin);
+    char* line = fgets(input, BUFFERSIZE, stdin);
     if(line == NULL)
     {
-      exit(EXIT_SUCCESS);
+      return INVALID_INPUT;
     }
+    // If the input exceeds the buffer size of the input, we need to read the
+    // overflowing data so that it is not inserted in the next input
+    if((strchr(line, '\n') == NULL))
+    {
+      char clear_stdin;
+      while((clear_stdin = fgetc(stdin) != '\n' && clear_stdin != EOF));
+      printf(ERROR_NUMBER_OF_TRIANGLES);
+      continue;
+    }
+
     if(!strcmp(line, "\n"))
     {
       continue;
@@ -339,7 +380,7 @@ int getNumberOfTriplets()
 
     if (number_of_triplets <= 0 || number_of_triplets > UCHAR_MAX )
     {
-      printf("[ERR] Invalid number of triangles.\n");
+      printf(ERROR_NUMBER_OF_TRIANGLES);
       continue;
     }
     else
@@ -366,8 +407,16 @@ int getNumberOfTriplets()
 int main()
 {
   int number_of_triplets = getNumberOfTriplets();
+  if(number_of_triplets == INVALID_INPUT)
+  {
+    return EXIT_SUCCESS;
+  }
   float triplet_data[number_of_triplets][SIDES];
-  getTripletData(triplet_data, number_of_triplets);
+  int get_triplet_response = getTripletData(triplet_data, number_of_triplets);
+  if(get_triplet_response == INVALID_INPUT)
+  {
+    return EXIT_SUCCESS;
+  }
   sort(triplet_data, number_of_triplets, SIDES);
   analyzeAllTriplets(triplet_data, number_of_triplets);
 
